@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BODYDOMAIN</title>
+  <link rel="stylesheet" href="/static/css/login.css">
+
+</head>
+
+<body>
+
+  <section>
+    <!-- Login -->
+    <div class="container">
+      <div class="user signinBox">
+        <!-- lOGIN IMG-->
+        <div class="imgBox">
+          <img
+            src="/static/img/o_front.jpg"
+            alt="login img">
+        </div>
+        <!-- FORM LOGIN -->
+        <div class="formBox">
+          <form action="/signin/" method="POST">
+            {% csrf_token %}
+            <h2>Iniciar sesión</h2>
+            <input type="text" name="username" autofocus autocapitalize="none" maxlength="150" id="id_username" required
+              placeholder="Usuario">
+            <input type="password" name="password" placeholder="Contraseña" id="id_password" required>
+            <div class="message_error">
+              <p>{{error}}</p>
+              <p>{{errorSignup}}</p>
+            </div>
+            <button type="submit">Log in</button>
+            <p class="signup">No tienes una cuenta? <a href="#">Registrate.</a></p>
+          </form>
+        </div>
+      </div>
+
+      <!-- Signup -->
+      <div class="user signupBox">
+        <div class="formBox">
+          <!-- FORM SIGNUP -->
+          <form action="/signup/" method="POST">
+            {% csrf_token %}
+            <h2>Crear una cuenta</h2>
+            <input type="text" name="username" placeholder="Usuario" required>
+            <input type="email" name="email" placeholder="Correo"required>
+            <input type="password" name="password1" placeholder="Contraseña nueva"required>
+            <input type="password" name="password2" placeholder="Confirmar Contraseña"required>
+            <div class="message_error">
+              <p>{{errorSignup}}</p>
+            </div>
+            <button type="submit">Registrar</button>
+            <p class="signup">Ya tienes una cuenta? <a href="#">Iniciar sesión.</a></p>
+          </form>
+        </div>
+
+        <!-- Signup IMG-->
+        <div class="imgBox">
+          <!-- https://cdn.shopify.com/s/files/1/2513/1876/files/weighted_7.jpg?v=1641997114 -->
+          <img src="/static/img/o_back.jpg" alt="" >
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- LOGIN SCRIPT -->
+  <script>
+    const toggleForm = () => {
+      const container = document.querySelector(".container");
+      const section = document.querySelector("section");
+
+      if (container.classList.contains("active")) {
+        container.classList.remove("active");
+        section.setAttribute("style", "background-color: #fee648");
+        return;
+      }
+      container.classList.add("active");
+      section.setAttribute("style", "background-color: #e23139");
+    };
+
+    const toggleLinks = Array.from(document.querySelectorAll(".signup a"));
+
+    toggleLinks.forEach((toggleLink) => {
+      toggleLink.addEventListener("click", toggleForm);
+    });
+
+  </script>
+</body>
+
+</html>

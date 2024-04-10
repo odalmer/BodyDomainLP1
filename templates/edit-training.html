@@ -1,0 +1,224 @@
+{% load static %}
+{% load trainings_templatetags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BODYDOMAIN</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <div class="wrapper new-training">
+        <section class="new-training_container">
+            <ul class="training_times">
+                {% if exercises %}
+
+                {% if training.time_start %}
+                <!-- Cuando inicie mostrar hora-->
+                <li><b>Start:</b> {{ training.time_start|date:'H:i' }}</li>
+
+                {% if training.time_end %}
+                <!-- Cuando termine mostrar hora-->
+                <li><b>End:</b> {{ training.time_end|date:'H:i' }}</li>
+                <li><b>Duration:</b> {{ training.duration|round_dt }}</li>
+                {% endif %}
+
+                {% endif %}
+
+                {% endif %}
+            </ul>
+
+            <div class="exercises_form">
+                {% if exercises %}
+                <form action="/stop-training/{{training.id}}/" method="POST">{% csrf_token %}
+
+                    <!-- show labels for exercises -->
+                    <div class="labels_row">
+                        <div class="exercises_label name_fields">Nombre</div>
+                        <div class="exercises_label number_input">Weight</div>
+                        <div class="exercises_label selector">&nbsp;</div>
+                        <div class="exercises_label number_input">Series</div>
+                    </div>
+
+
+                    <!-- show exercises -->
+                    {% for exercise in exercises %}
+                    <br />
+                    <div class="exercise_row">
+
+                        <div class="form_input">
+                            <input type="text" class="name_fields" name="name_{{exercise.id}}" value="{{exercise.name}}"
+                                readonly />
+                        </div>
+
+                        <div class="form_input">
+                            <input type="number" class="number_input" name="weight_kg_{{exercise.id}}" min="0"
+                                step="0.1" value="{{exercise.weight_kg}}" />
+                        </div>
+
+                        <div class="form_input">
+                            <select class="selector" name="weight_per_{{exercise.id}}">
+                                {% if "total" == exercise.weight_per %}
+                                <option value="total">total</option>
+                                <option value="per hand">per hand</option>
+                                {% else %}
+                                <option value="per hand">per hand</option>
+                                <option value="total">total</option>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        {% for k, v in exercise.reps.items %}
+                        <div class="form_input">
+                            <input type="number" class="number_input" name="rep_{{k}}" value="{{v}}" min="0" step="1" />
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% endfor %}
+
+                    <!-- training started - show stop button -->
+                    {% if training.time_start and not training.time_end %}
+                    <br />
+
+                    <div class="control_buttons">
+                        <div class="form_input">
+                            <input type="submit" class="stop" value="Stop" />
+                        </div>
+                        <!-- training can be canceled at any point -->
+                        <div class="form_input">
+                            <form><button formaction="/cancel-training/{{training.id}}/">Cancel</button></form>
+                        </div>
+                    </div>
+                    {% endif %}
+                </form>
+
+
+                <!-- training have not started yet - start button -->
+                {% if not training.time_start %}
+                <div class="control_buttons">
+                    <div class="form_input">
+                        <form action="/start-training/{{training.id}}/" method="POST">{% csrf_token %}
+                            <input type="submit" class="start" value="Start" />
+                        </form>
+                    </div>
+                    <!-- training can be canceled at any point -->
+                    <div class="form_input">
+                        <form><button formaction="/cancel-training/{{training.id}}/">Cancel</button></form>
+                    </div>
+                </div>
+                {% endif %}
+
+
+
+                <!-- training can be saved only if it started and finished -->
+                {% if training.time_start and training.time_end %}
+                <div class="control_buttons">
+                    <form action="/save-training/{{training.id}}/" method="POST">{% csrf_token %}
+                        <div class="form_input">
+                            <input type="text" class="input_mid" name="name" value="My weight training" />
+                        </div>
+                        <div class="form_input">
+                            <input type="submit" id="save_training" value="Save" />
+                        </div>
+                    </form>
+                    <!-- training can be canceled at any point -->
+                    <div class="form_input">
+                        <form><button formaction="/cancel-training/{{training.id}}/">Cancel</button></form>
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <p class="div_label">No hay ejercicios, añade algunos</p>
+                <form><button formaction="/cancel-training/{{training.id}}/">Cancel</button></form>
+                {% endif %}<!-- exercises -->
+            </div>
+
+
+            <!-- Add exercise form -->
+            {% if not training.time_start and not training.plan %}
+            <br />
+            <div class="add_form">
+                <p class="div_label">Añade ejercicios a la rutina</p>
+                <!-- show add exercise button -->
+                <form action="/add-exercise/{{training.id}}/" method="POST">{% csrf_token %}
+                    <div class="form_input">
+                        <label for="add_name">Nombre</label><br />
+                        <input type="text" class="name_fields" id="add_name" name="name" value="Exercise" />
+                    </div>
+
+                    <div class="form_input">
+                        <label for="add_weight_kg">Peso</label><br />
+                        <input type="number" id="add_weight_kg" class="number_input" name="weight_kg" min="0"
+                            value="0.0" step="0.1" />
+                    </div>
+
+                    <div class="form_input">
+                        <label for="add_weight_per">&nbsp;</label><br />
+                        <select name="weight_per" class="selector" id="add_weight_per">
+                            <option value="total">total</option>
+                            <option value="per hand">Unilateral</option>
+                        </select>
+                    </div>
+
+                    <div class="form_input">
+                        <label for="add_series">Series</label><br />
+                        <input type="number" class="number_input" id="add_series" name="series" value="3" step="1"
+                            min="1" max="6">
+                    </div>
+
+                    <div class="form_input">
+                        <label for="add_submit">&nbsp;</label><br />
+                        <input type="submit" id="add_submit" value="Agregar" />
+                    </div>
+                </form>
+            </div>
+
+            {% if exercises %}
+            <div class="add_form">
+                <p class="div_label">Guardar entrenamiento</p>
+                <form action="/save-training-plan/{{training.id}}/" method="POST">{% csrf_token %}
+                    <div class="form_input">
+                        <label for="plan_name">Nombre del entrenamiento</label><br />
+                        <input type="text" class="input_wide" id="plan_name" name="name" value="My training plan" />
+                    </div>
+
+                    <div class="form_input">
+                        <label for="save_plan">&nbsp;</label><br />
+                        <input type="submit" id="save_plan" value="Save" />
+                    </div>
+                </form>
+            </div>
+            {% elif training_plans %}
+            <div class="add_form">
+                <!-- show load as training plan form -->
+                <form action="/load-training-plan/{{training.id}}/" method="POST">{% csrf_token %}
+                    <div class="form_input">
+                        <label for="select_plan">Cargar entreno</label><br />
+                        <select name="selected_plan_id" class="input_wide" id="select_plan">
+                            {% for plan in training_plans %}
+                            <option value="{{plan.id}}">{{ plan.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form_input">
+                        <label for="load_plan">&nbsp;</label><br />
+                        <input type="submit" id="load_plan" value="Load" />
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            {% endif %}
+
+            {% endif %}
+
+        </section>
+    </div>
+</body>
+
+</html>

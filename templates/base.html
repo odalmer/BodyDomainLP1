@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BODYDOMAIN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <link rel="stylesheet" href="/static/css/add_exercise.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="topnav" id="myTopnav">
+        {% block navbar_active %}
+        <a href="/trainings/" class="active">Mis Entrenos <i class="fa fa-home" aria-hidden="true"></i></a>
+        <a href="/progress-analysis/">Estadisticas <i class="fa fa-book"></i></a>
+        <a href="/record-training/">Nuevo entreno <i class="fa fa-envelope"></i></a>
+        {% endblock %}
+        {% if user.is_authenticated %}
+        <div class="right-lnk">
+            <a href="/logout">logout</i></a>
+        </div>
+        {% else %}
+        <div class="right-lnk">
+            <a href="/signin">login</i></a>
+        </div>
+        {% endif %}
+        <a href="javascript:void(0);" class="icon" onclick="myFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+    </div>
+    <div class="container">
+        <div class="wrapper">
+            <section>
+
+                {% block content %}
+                {% endblock %}
+
+            </section>
+        </div>
+        <!-- <footer>
+            Odalmer 22-0372 | Ryam Madera
+            <a href="https://www.instagram.com/odalmerpimentel/" target="_blank">IG</a>
+        </footer> -->
+    </div>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("myTopnav");
+            if (x.className === "topnav") {
+                x.className += " responsive";
+            } else {
+                x.className = "topnav";
+            }
+        }
+    </script>
+</body>
+
+</html>
